@@ -1,0 +1,10 @@
+package: github.com/ipedrazas/backpressure
+import:
+- package: k8s.io/apimachinery
+  subpackages:
+  - pkg/api/errors
+  - pkg/apis/meta/v1
+- package: k8s.io/client-go
+  subpackages:
+  - kubernetes
+  - tools/clientcmd
