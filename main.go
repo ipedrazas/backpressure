@@ -22,10 +22,12 @@ var (
 	target          = os.Getenv("TARGET")
 	iterations, err = strconv.Atoi(os.Getenv("NUM"))
 
-	reqLatency = prometheus.NewGauge(prometheus.GaugeOpts{
-		Name: "backpressure_req_latency",
-		Help: "Latency of a request.",
+	reqLatency = prometheus.NewHistogram(prometheus.HistogramOpts{
+		Name:    "backpressure_req_latency",
+		Help:    "The latency of the requests.",
+		Buckets: prometheus.LinearBuckets(0, 100, 20),
 	})
+
 	reqOk = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "backpressure_req_ok_total",
 		Help: "Number of successful requests.",
@@ -65,10 +67,10 @@ func doGet() {
 	}
 
 	for index := 0; index < iterations; index++ {
+		begin := time.Now()
 
 		req, err := http.NewRequest("GET", target, nil)
-		ctx := httpstat.WithHTTPStat(req.Context(), &result)
-		req = req.WithContext(ctx)
+
 		if err != nil {
 			panic(err)
 		}
@@ -77,7 +79,6 @@ func doGet() {
 		if err != nil {
 			log.Fatal(err)
 		}
-
 		if _, err := io.Copy(ioutil.Discard, res.Body); err != nil {
 			log.Fatal(err)
 		}
@@ -87,12 +88,9 @@ func doGet() {
 			reqFail.Inc()
 		}
 		res.Body.Close()
-		result.End(time.Now())
-
-		duration := result.Total(time.Now())
-		reqLatency.Set(float64(duration))
-		fmt.Printf("%+v\n", result)
-		fmt.Println("...")
+		reqLatency.Observe(float64(time.Since(begin).Nanoseconds()))
+		time.Sleep(time.Second * 1)
+		fmt.Println(time.Since(begin).Nanoseconds())
 	}
 }
 
