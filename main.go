@@ -18,9 +18,11 @@ import (
 )
 
 var (
-	addr            = flag.String("listen-address", ":8080", "The address to listen on for HTTP requests.")
-	target          = os.Getenv("TARGET")
-	iterations, err = strconv.Atoi(os.Getenv("NUM"))
+	addr          = flag.String("listen-address", ":8080", "The address to listen on for HTTP requests.")
+	target        = os.Getenv("TARGET")
+	iterations, _ = strconv.Atoi(os.Getenv("NUM"))
+	pause, _      = strconv.Atoi(os.Getenv("PAUSE"))
+	agents, _     = strconv.Atoi(os.Getenv("AGENTS"))
 
 	reqLatency = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "backpressure_req_latency",
@@ -47,24 +49,24 @@ func init() {
 
 func main() {
 
-	go func() {
-		method := strings.ToLower(os.Getenv("METHOD"))
-		switch method {
-		case "get":
-			doGet()
-		case "post":
-			doPost()
-		}
-	}()
+	for index := 0; index < agents; index++ {
+		go func() {
+			method := strings.ToLower(os.Getenv("METHOD"))
+			switch method {
+			case "get":
+				doGet()
+			case "post":
+				doPost()
+			}
+		}()
+	}
+
 	http.Handle("/metrics", promhttp.Handler())
 	log.Fatal(http.ListenAndServe(*addr, nil))
 
 }
 
 func doGet() {
-	if err != nil {
-		panic(err)
-	}
 
 	for index := 0; index < iterations; index++ {
 		begin := time.Now()
@@ -89,8 +91,8 @@ func doGet() {
 		}
 		res.Body.Close()
 		reqLatency.Observe(float64(time.Since(begin).Nanoseconds()))
-		time.Sleep(time.Second * 1)
-		fmt.Println(time.Since(begin).Nanoseconds())
+		fmt.Printf("%d - %d\n", index, time.Since(begin).Nanoseconds())
+		time.Sleep(time.Millisecond * time.Duration(pause))
 	}
 }
 
