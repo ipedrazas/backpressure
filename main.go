@@ -23,19 +23,20 @@ var (
 	iterations, _ = strconv.Atoi(os.Getenv("NUM"))
 	pause, _      = strconv.Atoi(os.Getenv("PAUSE"))
 	agents, _     = strconv.Atoi(os.Getenv("AGENTS"))
+	app           = os.Getenv("APP")
 
 	reqLatency = prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name:    "backpressure_req_latency",
+		Name:    "backpressure_" + app + "_req_latency",
 		Help:    "The latency of the requests.",
 		Buckets: prometheus.LinearBuckets(0, 100, 20),
 	})
 
 	reqOk = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "backpressure_req_ok_total",
+		Name: "backpressure_" + app + "req_ok_total",
 		Help: "Number of successful requests.",
 	})
 	reqFail = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "backpressure_req_errors_total",
+		Name: "backpressure_" + app + "req_errors_total",
 		Help: "Number of requests with errors.",
 	})
 	result httpstat.Result
