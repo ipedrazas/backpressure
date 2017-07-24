@@ -25,3 +25,27 @@ func TestGetPods(t *testing.T) {
 		t.Errorf("Error getting heapster %v", err)
 	}
 }
+
+func TestGetMetrics(t *testing.T) {
+	namespace := "default"
+	labels :=
+		map[string]string{
+			"component": "controller",
+		}
+
+	pods, err := getPods(labels, namespace)
+	if err != nil {
+		t.Errorf("Error getting pods %v", err)
+	}
+	for _, pod := range pods.Items {
+		metrics, ts, err := getMetricsByPodName(pod.Name, namespace)
+		if err != nil {
+			t.Errorf("Error getting metrics %v", err)
+		}
+		fmt.Printf("%v -- %v", ts, metrics)
+
+	}
+	if len(pods.Items) == 0 {
+		t.Errorf("Error getting heapster %v", err)
+	}
+}

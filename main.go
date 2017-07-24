@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -24,6 +25,7 @@ var (
 	pause, _      = strconv.Atoi(os.Getenv("PAUSE"))
 	agents, _     = strconv.Atoi(os.Getenv("AGENTS"))
 	app           = os.Getenv("APP")
+	kubeconfig    *string
 
 	reqLatency = prometheus.NewHistogram(prometheus.HistogramOpts{
 		Name:    "backpressure_" + app + "_req_latency",
@@ -46,6 +48,14 @@ func init() {
 	prometheus.MustRegister(reqLatency)
 	prometheus.MustRegister(reqOk)
 	prometheus.MustRegister(reqFail)
+
+	if home := homeDir(); home != "" {
+		kubeconfig = flag.String("kubeconfig", filepath.Join(home, ".kube", "config"), "(optional) absolute path to the kubeconfig file")
+	} else {
+		kubeconfig = flag.String("kubeconfig", "", "absolute path to the kubeconfig file")
+	}
+	flag.Parse()
+
 }
 
 func main() {
