@@ -42,7 +42,7 @@ func TestGetMetrics(t *testing.T) {
 		if err != nil {
 			t.Errorf("Error getting metrics %v", err)
 		}
-		fmt.Printf("%v -- %v", ts, metrics)
+		fmt.Printf("%v -- %v\n", ts, metrics)
 
 	}
 	if len(pods.Items) == 0 {
