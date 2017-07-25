@@ -20,6 +20,15 @@ Right now there are two kinds of pressure:
 * HTTP: you can configure a backpressure job to hit a service over http.
 * SQL: you can configure a backpressure job to launch a series of `sql` queries to the backends.
 
-# TODO:
-Create a simple UI that allows to control the `backpressure` jobs.
+## Architechture
 
+Backpressure has 3 main components that integrate with 4 third party systems:
+
+* Heapster
+* Kubernetes API Server
+* Postgres
+* Prometheus
+
+The following component diagram helps to understand how all the pieces fit together:
+
+![Component Diagram](docs/component-diagram.png)
