@@ -34,6 +34,8 @@ spec:
               value: {{ .Values.load.pause | quote }}
             - name: AGENTS
               value: {{ .Values.load.agents | quote }}
+            - name: APP
+              value: {{ .Values.load.app | quote }}
             - name: POD_NAME
               valueFrom:
                 fieldRef:

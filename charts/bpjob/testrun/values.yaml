@@ -42,3 +42,4 @@ load:
   target: http://google.com
   pause: 100
   agents: 10
+  app: my-app

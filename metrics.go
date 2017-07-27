@@ -37,6 +37,8 @@ func getPods(lbls map[string]string, namespace string) (*v1.PodList, error) {
 type PodMetrics struct {
 	Metrics         []PodMetricsInfo `json:"metrics"`
 	LatestTimestamp time.Time        `json:"latestTimestamp"`
+	Container       string
+	Pod             string
 }
 
 type PodMetricsInfo struct {
@@ -55,6 +57,8 @@ func getMetricsByPodName(podName string, namespace string) (*PodMetrics, time.Ti
 	if err != nil {
 		return nil, time.Time{}, fmt.Errorf("failed to unmarshal heapster response: %v", err)
 	}
+	metrics.Pod = podName
+	// metrics.Container =
 	return &metrics, time.Time{}, nil
 }
 
